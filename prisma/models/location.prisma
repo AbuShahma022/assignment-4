@@ -1,0 +1,18 @@
+model Location {
+  id         String   @id @default(uuid()) @db.Uuid
+
+  country    String
+  division   String
+  district   String
+  area       String
+  postalCode String?  @map("postal_code")
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  technicianProfiles TechnicianProfile[]
+
+  @@unique([country, division, district, area])
+
+  @@map("locations")
+}

@@ -1,0 +1,21 @@
+model Availability {
+  id String @id @default(uuid()) @db.Uuid
+
+  technicianProfileId String @map("technician_profile_id") @db.Uuid
+
+  dayOfWeek DayOfWeek @map("day_of_week")
+
+  startTime DateTime @map("start_time") @db.Time
+  endTime   DateTime @map("end_time") @db.Time
+
+  status AvailabilityStatus @default(AVAILABLE)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  technicianProfile TechnicianProfile @relation(fields: [technicianProfileId],references: [id],onDelete: Cascade)
+
+  @@unique([technicianProfileId, dayOfWeek, startTime, endTime])
+
+  @@map("availabilities")
+}

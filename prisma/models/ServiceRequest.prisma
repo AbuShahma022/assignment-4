@@ -1,0 +1,22 @@
+model ServiceRequest {
+  id String @id @default(uuid()) @db.Uuid
+
+  technicianProfileId String @map("technician_profile_id") @db.Uuid
+  categoryId          String @map("category_id") @db.Uuid
+
+  requestedServiceName String @db.VarChar(150) @map("requested_service_name")
+  description          String?
+
+  status ServiceRequestStatus @default(PENDING)
+
+  adminFeedback String? @map("admin_feedback")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  technicianProfile TechnicianProfile @relation(fields: [technicianProfileId],references: [id],onDelete: Cascade)
+
+  category Category @relation(fields: [categoryId],references: [id])
+
+  @@map("service_requests")
+}
