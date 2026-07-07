@@ -3,6 +3,9 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import router from "./routes";
+import httpStatus  from "http-status";
+import globalErrorHandler from "./middleware/globalErrorHandlers";
 
 const app = express();
 
@@ -43,5 +46,15 @@ app.get("/", (req: Request, res: Response) => {
     uptime: `${process.uptime().toFixed(2)} seconds`,
   });
 });
+
+app.use("/api",router)
+app.use((req, res) => {
+  res.status(httpStatus.NOT_FOUND).json({
+    success: false,
+    message: "Route Not Found",
+  });
+});
+
+app.use(globalErrorHandler);
 
 export default app;
