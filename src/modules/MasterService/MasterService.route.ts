@@ -19,4 +19,23 @@ router.get(
   MasterserviceController.getAllServices
 );
 
+router.get(
+  "/:id",
+  MasterserviceController.getSingleService
+);
+
+router.patch(
+  "/update-service/:id",
+  auth(Role.ADMIN),
+  validateZodSchema(ServiceValidation.updateServiceValidationSchema),
+  MasterserviceController.updateService
+);
+
+router.delete(
+  "/delete-service/:id",
+  auth(Role.ADMIN),
+  MasterserviceController.deleteService
+);
+
+
 export const MasterServiceRoute = router
