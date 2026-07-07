@@ -6,3 +6,8 @@ export interface IRegisterUser {
   profileImage?: string;
   role?: "CUSTOMER" | "TECHNICIAN";
 }
+
+export interface ILoginUser {
+  email: string;
+  password: string;
+}
