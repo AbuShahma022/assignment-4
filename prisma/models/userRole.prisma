@@ -1,0 +1,14 @@
+model UserRole {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId String @db.Uuid @map("user_id")
+  role   Role
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+
+  @@map("user_roles")
+}

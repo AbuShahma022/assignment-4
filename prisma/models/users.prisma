@@ -5,7 +5,7 @@ model User {
   password     String
   phone        String?    @db.VarChar(20)
   profileImage String?
-  role         UserRole   @default(CUSTOMER)
+  role         UserRole[]   
   status       UserStatus @default(ACTIVE)
 
   createdAt    DateTime   @default(now()) @map("created_at")
