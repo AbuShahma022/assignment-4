@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authRoute } from "../modules/auth/auth.route";
 import { userRoute } from "../modules/user/user.route";
 import { categoryRoute } from "../modules/category/category.route";
+import { MasterServiceRoute } from "../modules/MasterService/MasterService.route";
 
 interface IRoute {
     path: string;
@@ -21,6 +22,10 @@ const allRoutes : IRoute[] = [
     {
         path:"/category",
         route: categoryRoute
+    },
+    {
+        path:"/master-service",
+        route: MasterServiceRoute
     }
 ]
 
