@@ -1,6 +1,7 @@
 import { Role } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
+import { jwtUtils } from "../../utils/jwt";
 import { ICreateTechnicianProfile } from "./technicianProfile.interface";
 import httpStatus from "http-status"
 const createTechnicianProfile = async (
@@ -87,8 +88,28 @@ const createTechnicianProfile = async (
         },
       });
     }
+    const updatedUser = await tx.user.findUnique({
+  where: {
+    id: userId,
+  },
+  include: {
+    role: true,
+  },
+});
 
-    return technicianProfile;
+const jwtPayload = {
+  userId: updatedUser!.id,
+  email: updatedUser!.email,
+  roles: updatedUser!.role.map((item) => item.role),
+};
+
+const tokens = jwtUtils.generateTokens(jwtPayload);
+
+    return {
+        technicianProfile,
+        tokens
+
+    };
   },
   {
     timeout: 20000, 
@@ -98,6 +119,46 @@ const createTechnicianProfile = async (
 
   return result;
 };
+
+const getMyTechnicianProfile = async (userId: string) => {
+  const result = await prisma.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+    include: {
+      user: {
+        omit: {
+          password: true,
+        },
+        include: {
+          role: true,
+        },
+      },
+      location: true,
+      technicianServices: {
+        include: {
+          service: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      },
+      availabilities: true,
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician profile not found."
+    );
+  }
+
+  return result;
+};
+
 export const technicianProfileService = {
   createTechnicianProfile,
+  getMyTechnicianProfile
 };

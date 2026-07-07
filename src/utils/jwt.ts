@@ -1,4 +1,5 @@
 import jwt,{ JwtPayload, SignOptions } from "jsonwebtoken";
+import config from "../config";
 
 const createToken =(payLoad: JwtPayload, secret:string, expiresIn: SignOptions)=>{
 
@@ -24,7 +25,27 @@ const verifyToken = (token:string, secret:string)=> {
     }
 };
 
+const generateTokens = (payload: JwtPayload) => {
+  const accessToken = createToken(
+    payload,
+    config.jwt.accessTokenSecret,
+    config.jwt.accessTokenExpiresIn as SignOptions
+  );
+
+  const refreshToken = createToken(
+    payload,
+    config.jwt.refreshTokenSecret,
+    config.jwt.refreshTokenExpiresIn as SignOptions
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+};
+
 export const jwtUtils = {
     createToken,
-    verifyToken
+    verifyToken,
+    generateTokens
 }
