@@ -4,20 +4,6 @@ import sendResponse from "../../utils/sendResponse";
 import { authService } from "./auth.service";
 import httpStatus from "http-status";
 
-const register = catchAsync(async(req,res)=>{
-
-    const payload = req.body
-
-    const result = await authService.register(payload)
-
-    sendResponse(res, {
-      statusCode: httpStatus.CREATED,
-      success: true,
-      message: "User registered successfully.",
-      data: result,
-    });
-
-})
 
 const login = catchAsync(async(req,res)=>{
 
@@ -72,8 +58,9 @@ const refreshToken = catchAsync(async(req,res)=>{
 })
 
 
+
 export const authController = {
-    register,
+    
     login,
     refreshToken
 }
