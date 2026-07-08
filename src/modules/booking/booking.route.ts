@@ -26,9 +26,21 @@ router.get(
 );
 
 router.get(
+  "/get-all-bookings",
+  auth(Role.ADMIN),
+  bookingController.getAllBookings
+);
+
+router.get(
   "/get-my-booking-details/:id",
   auth(Role.CUSTOMER),
   bookingController.getMyBookingDetailsById
+);
+
+router.get(
+  "/get-booking-details/:id",
+  auth(Role.ADMIN),
+  bookingController.getBookingDetailsById
 );
 
 router.patch(

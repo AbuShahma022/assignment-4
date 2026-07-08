@@ -713,6 +713,93 @@ const completeBooking = async (
   return formatBookingAvailability(result);
 };
 
+const getAllBookings = async () => {
+  const result = await prisma.booking.findMany({
+    include: {
+      customer: {
+        omit: {
+          password: true,
+        },
+      },
+      technicianService: {
+        include: {
+          service: {
+            include: {
+              category: true,
+            },
+          },
+          technicianProfile: {
+            include: {
+              user: {
+                omit: {
+                  password: true,
+                },
+              },
+              location: true,
+            },
+          },
+        },
+      },
+      availability: true,
+      payment: true,
+      review: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result.map((booking) =>
+    formatBookingAvailability(booking)
+  );
+};
+
+const getBookingDetailsById = async (bookingId: string) => {
+  const result = await prisma.booking.findUnique({
+    where: {
+      id: bookingId,
+    },
+    include: {
+      customer: {
+        omit: {
+          password: true,
+        },
+      },
+      technicianService: {
+        include: {
+          service: {
+            include: {
+              category: true,
+            },
+          },
+          technicianProfile: {
+            include: {
+              user: {
+                omit: {
+                  password: true,
+                },
+              },
+              location: true,
+            },
+          },
+        },
+      },
+      availability: true,
+      payment: true,
+      review: true,
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Booking not found."
+    );
+  }
+
+  return formatBookingAvailability(result);
+};
+
 export const bookingService = {
   createBooking,
   getMyBookings,
@@ -723,6 +810,8 @@ export const bookingService = {
   acceptBooking,
   declineBooking,
   markBookingInProgress,
-  completeBooking
+  completeBooking,
+  getAllBookings,
+  getBookingDetailsById,
 
 };

@@ -143,6 +143,30 @@ const completeBooking = catchAsync(async (req, res) => {
   });
 });
 
+const getAllBookings = catchAsync(async (req, res) => {
+  const result = await bookingService.getAllBookings();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All bookings retrieved successfully.",
+    data: result,
+  });
+});
+
+const getBookingDetailsById = catchAsync(async (req, res) => {
+  const result = await bookingService.getBookingDetailsById(
+    req.params.id as string
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Booking details retrieved successfully.",
+    data: result,
+  });
+});
+
 export const bookingController = {
   createBooking,
   getMyBookings,
@@ -153,6 +177,8 @@ export const bookingController = {
   acceptBooking,
   declineBooking,
   markBookingInProgress,
-  completeBooking
+  completeBooking,
+  getAllBookings,
+  getBookingDetailsById
 
 };
