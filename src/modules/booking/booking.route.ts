@@ -19,4 +19,51 @@ router.get(
   bookingController.getMyBookings
 );
 
+router.get(
+  "/get-technician-bookings",
+  auth(Role.TECHNICIAN),
+  bookingController.getTechnicianBookings
+);
+
+router.get(
+  "/get-my-booking-details/:id",
+  auth(Role.CUSTOMER),
+  bookingController.getMyBookingDetailsById
+);
+
+router.patch(
+  "/cancel-my-booking/:id",
+  auth(Role.CUSTOMER),
+  bookingController.cancelMyBooking
+);
+
+router.get(
+  "/get-technician-booking-details/:id",
+  auth(Role.TECHNICIAN),
+  bookingController.getTechnicianBookingDetailsById
+);
+
+router.patch(
+  "/accept-booking/:id",
+  auth(Role.TECHNICIAN),
+  bookingController.acceptBooking
+);
+
+router.patch(
+  "/decline-booking/:id",
+  auth(Role.TECHNICIAN),
+  bookingController.declineBooking
+);
+
+router.patch(
+  "/mark-booking-in-progress/:id",
+  auth(Role.TECHNICIAN),
+  bookingController.markBookingInProgress
+);
+
+router.patch(
+  "/complete-booking/:id",
+  auth(Role.TECHNICIAN),
+  bookingController.completeBooking
+);
 export const bookingRoute = router
