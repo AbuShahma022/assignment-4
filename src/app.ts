@@ -7,6 +7,7 @@ import router from "./routes";
 import httpStatus  from "http-status";
 import globalErrorHandler from "./middleware/globalErrorHandlers";
 
+
 const app = express();
 
 
@@ -29,7 +30,7 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-
+app.use ("/api/payment/webhook",express.raw({type: 'application/json'}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
