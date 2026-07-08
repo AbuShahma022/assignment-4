@@ -6,13 +6,10 @@ const createBookingValidationSchema = z.object({
 
     availabilityId: z.string().uuid(),
 
-    scheduledAt: z.string().datetime(),
-
     address: z
       .string()
       .trim()
-      .min(5)
-      .max(255),
+      .min(5),
 
     problemDescription: z
       .string()
