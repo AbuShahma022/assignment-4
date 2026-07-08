@@ -14,8 +14,10 @@ model Availability {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   technicianProfile TechnicianProfile @relation(fields: [technicianProfileId],references: [id],onDelete: Cascade)
+  
 
   @@unique([technicianProfileId, dayOfWeek, startTime, endTime])
+   bookings Booking[]
 
   @@map("availabilities")
 }

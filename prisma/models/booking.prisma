@@ -3,6 +3,7 @@ model Booking {
 
   customerId          String @map("customer_id") @db.Uuid
   technicianServiceId String @map("technician_service_id") @db.Uuid
+  availabilityId String @map("availability_id") @db.Uuid
 
   scheduledAt DateTime @map("scheduled_at")
 
@@ -19,6 +20,7 @@ model Booking {
   customer User @relation( fields: [customerId],references: [id])
 
   technicianService TechnicianService @relation(fields: [technicianServiceId],references: [id])
+  availability Availability @relation(fields: [availabilityId],references: [id])
 
   payment Payment?
   review  Review?
