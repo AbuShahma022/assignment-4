@@ -6,6 +6,7 @@ import { MasterServiceRoute } from "../modules/MasterService/MasterService.route
 import { technicianProfileRoute } from "../modules/technicianProfile/technicianProfile.route";
 import { technicianServicesRoute } from "../modules/technicianServices/technicianServices.route";
 import { availabilityRoute } from "../modules/availability/availiability.route";
+import { bookingRoute } from "../modules/booking/booking.route";
 
 interface IRoute {
     path: string;
@@ -41,6 +42,10 @@ const allRoutes : IRoute[] = [
     {
         path:"/availiabilty",
         route: availabilityRoute
+    },
+    {
+        path: "/booking",
+        route: bookingRoute
     }
 ]
 
