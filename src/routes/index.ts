@@ -4,6 +4,7 @@ import { userRoute } from "../modules/user/user.route";
 import { categoryRoute } from "../modules/category/category.route";
 import { MasterServiceRoute } from "../modules/MasterService/MasterService.route";
 import { technicianProfileRoute } from "../modules/technicianProfile/technicianProfile.route";
+import { technicianServicesRoute } from "../modules/technicianServices/technicianServices.route";
 
 interface IRoute {
     path: string;
@@ -31,6 +32,10 @@ const allRoutes : IRoute[] = [
     {
         path:"/technician-profile",
         route: technicianProfileRoute
+    },
+    {
+        path:"/technician-service",
+        route: technicianServicesRoute
     }
 ]
 
