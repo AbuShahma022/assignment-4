@@ -3,7 +3,8 @@ model Payment {
 
   bookingId String @unique @map("booking_id") @db.Uuid
 
-  transactionId String @unique @map("transaction_id")
+  transactionId String? @unique @map("transaction_id")
+  stripeSessionId String? @unique @map("stripe_session_id")
 
   amount Decimal @db.Decimal(10, 2)
 
