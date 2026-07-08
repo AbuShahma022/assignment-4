@@ -23,6 +23,30 @@ const createTechnicianProfileValidationSchema = z.object({
   }),
 });
 
+const updateTechnicianProfileValidationSchema = z.object({
+  body: z
+    .object({
+      bio: z.string().trim().max(500).optional(),
+
+      experienceYears: z.number().int().min(0).optional(),
+
+      location: z
+        .object({
+          country: z.string().trim().optional(),
+          division: z.string().trim().optional(),
+          district: z.string().trim().optional(),
+          area: z.string().trim().optional(),
+          postalCode: z.string().trim().optional(),
+        })
+        .optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: "At least one field is required.",
+    }),
+});
+
+
 export const TechnicianProfileValidation = {
   createTechnicianProfileValidationSchema,
+  updateTechnicianProfileValidationSchema
 };

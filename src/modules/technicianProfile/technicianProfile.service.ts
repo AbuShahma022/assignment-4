@@ -1,8 +1,9 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { Role } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import { jwtUtils } from "../../utils/jwt";
-import { ICreateTechnicianProfile } from "./technicianProfile.interface";
+import { ICreateTechnicianProfile, IUpdateTechnicianProfile } from "./technicianProfile.interface";
 import httpStatus from "http-status"
 const createTechnicianProfile = async (
   userId: string,
@@ -158,7 +159,162 @@ const getMyTechnicianProfile = async (userId: string) => {
   return result;
 };
 
+const updateMyTechnicianProfile = async (
+  userId: string,
+  payload: IUpdateTechnicianProfile
+) => {
+  // Check profile exists
+  const isProfileExist = await prisma.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+    include: {
+      location: true,
+    },
+  });
+
+  if (!isProfileExist) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician profile not found."
+    );
+  }
+
+ const result = await prisma.$transaction(async (tx) => {
+/*
+problem solve here we use share location id for different user. suppose if a and b have same location
+id and if anyone change a location and update b location also change. but now first if someone change
+location then first search exising location and if exist then change location id to that location id
+for update user. that way other user still same location. if not exist then create new location 
+
+*/
+
+
+  const updateData: Prisma.TechnicianProfileUpdateInput = {
+    bio: payload.bio,
+    experienceYears: payload.experienceYears,
+  };
+
+  // Update location if provided
+  if (payload.location) {
+    let location = await tx.location.findFirst({
+      where: {
+        country: payload.location.country,
+        division: payload.location.division,
+        district: payload.location.district,
+        area: payload.location.area,
+      },
+    });
+
+    if (!location) {
+      location = await tx.location.create({
+        data: payload.location,
+      });
+    }
+
+    updateData.location = {
+    connect: {
+      id: location.id,
+    },
+  };
+  }
+
+  // Update technician profile only once
+  await tx.technicianProfile.update({
+    where: {
+      userId,
+    },
+    data: updateData,
+  });
+
+  // Return updated profile
+  const updatedProfile = await tx.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+    include: {
+      user: {
+        omit: {
+          password: true,
+        },
+        include: {
+          role: true,
+        },
+      },
+      location: true,
+    },
+  });
+
+  return updatedProfile;
+});
+
+return result;
+  
+};
+
+const getAllTechnicians = async () => {
+  const result = await prisma.technicianProfile.findMany({
+    include: {
+      user: {
+        omit: {
+          password: true,
+        },
+        include: {
+          role: true,
+        },
+      },
+      location: true,
+    },
+    orderBy: {
+      averageRating: "desc",
+    },
+  });
+
+  return result;
+};
+
+const getSingleTechnician = async (technicianId: string) => {
+  const result = await prisma.technicianProfile.findUnique({
+    where: {
+      id: technicianId,
+    },
+    include: {
+      user: {
+        omit: {
+          password: true,
+        },
+        include: {
+          role: true,
+        },
+      },
+      location: true,
+      technicianServices: {
+        include: {
+          service: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      },
+      availabilities: true,
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician not found."
+    );
+  }
+
+  return result;
+};
+
 export const technicianProfileService = {
   createTechnicianProfile,
-  getMyTechnicianProfile
+  getMyTechnicianProfile,
+  updateMyTechnicianProfile,
+  getAllTechnicians,
+  getSingleTechnician
 };

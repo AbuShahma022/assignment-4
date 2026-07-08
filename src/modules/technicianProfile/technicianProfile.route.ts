@@ -23,4 +23,23 @@ router.get(
 );
 
 
+router.patch(
+  "/update-my-technician-profile",
+  auth(Role.TECHNICIAN),
+  validateZodSchema(
+    TechnicianProfileValidation.updateTechnicianProfileValidationSchema
+  ),
+  technicianProfileController.updateMyTechnicianProfile
+);
+
+router.get(
+  "/get-all-technicians",
+  technicianProfileController.getAllTechnicians
+);
+
+router.get(
+  "/:id",
+  technicianProfileController.getSingleTechnician
+);
+
 export const technicianProfileRoute = router
