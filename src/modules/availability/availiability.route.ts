@@ -21,4 +21,26 @@ router.get(
   availabilityController.getMyAvailabilities
 );
 
+
+
+router.get(
+  "/get-technician-availabilities/:id",
+  availabilityController.getTechnicianAvailabilities
+);
+
+router.patch(
+  "/update-my-availability/:id",
+  auth(Role.TECHNICIAN),
+  validateZodSchema(
+    AvailabilityValidation.updateAvailabilityValidationSchema
+  ),
+  availabilityController.updateMyAvailability
+);
+
+router.delete(
+  "/delete-my-availability/:id",
+  auth(Role.TECHNICIAN),
+  availabilityController.deleteMyAvailability
+);
+
 export const availabilityRoute = router
