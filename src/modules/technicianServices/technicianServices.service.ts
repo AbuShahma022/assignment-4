@@ -166,8 +166,136 @@ const getTechnicianServices = async (technicianId: string) => {
 };
 };
 
+const updateMyService = async (
+  userId: string,
+  serviceId: string,
+  payload: IUpdateTechnicianService
+) => {
+  // Find technician profile
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+  });
+
+  if (!technicianProfile) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician profile not found."
+    );
+  }
+
+  // Check service belongs to technician
+  const technicianService = await prisma.technicianService.findFirst({
+    where: {
+      id: serviceId,
+      technicianProfileId: technicianProfile.id,
+      status: "ACTIVE",
+    },
+  });
+
+  if (!technicianService) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician service not found."
+    );
+  }
+
+  const result = await prisma.technicianService.update({
+    where: {
+      id: serviceId,
+    },
+    data: payload,
+    include: {
+      service: {
+        include: {
+          category: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const deleteMyService = async (
+  userId: string,
+  serviceId: string
+) => {
+  // Find technician profile
+  const technicianProfile = await prisma.technicianProfile.findUnique({
+    where: {
+      userId,
+    },
+  });
+
+  if (!technicianProfile) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician profile not found."
+    );
+  }
+
+  // Check ownership
+  const technicianService = await prisma.technicianService.findFirst({
+    where: {
+      id: serviceId,
+      technicianProfileId: technicianProfile.id,
+      status: "ACTIVE",
+    },
+  });
+
+  if (!technicianService) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician service not found."
+    );
+  }
+
+  const result = await prisma.technicianService.update({
+    where: {
+      id: serviceId,
+    },
+    data: {
+      status: "INACTIVE",
+    },
+  });
+
+  return result;
+};
+
+const getAllTechnicianServices = async () => {
+  const result = await prisma.technicianService.findMany({
+    include: {
+      technicianProfile: {
+        include: {
+          user: {
+            omit: {
+              password: true,
+            },
+          },
+          location: true,
+        },
+      },
+      service: {
+        include: {
+          category: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
 export const technicianService = {
   createTechnicianService,
   getMyServices,
   getTechnicianServices,
+  updateMyService,
+  deleteMyService,
+  getAllTechnicianServices
 };

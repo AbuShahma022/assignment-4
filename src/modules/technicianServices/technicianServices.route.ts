@@ -24,8 +24,33 @@ router.get(
 );
 
 router.get(
+  "/get-all-technician-services",
+  auth(Role.ADMIN),
+  technicianServiceController.getAllTechnicianServices
+);
+
+router.get(
   "/:technicianid",
   technicianServiceController.getTechnicianServices
 );
+
+
+
+
+router.patch(
+  "/update-my-service/:id",
+  auth(Role.TECHNICIAN),
+  validateZodSchema(
+    TechnicianServiceValidation.updateTechnicianServiceValidationSchema
+  ),
+  technicianServiceController.updateMyService
+);
+
+router.delete(
+  "/delete-my-service/:id",
+  auth(Role.TECHNICIAN),
+  technicianServiceController.deleteMyService
+);
+
 
  export const technicianServicesRoute = router

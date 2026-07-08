@@ -41,8 +41,51 @@ const getTechnicianServices = catchAsync(async (req, res) => {
   });
 });
 
+const updateMyService = catchAsync(async (req, res) => {
+  const result = await technicianService.updateMyService(
+    req.user!.id,
+    req.params.id,
+    req.body
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Technician service updated successfully.",
+    data: result,
+  });
+});
+
+const deleteMyService = catchAsync(async (req, res) => {
+  const result = await technicianService.deleteMyService(
+    req.user!.id,
+    req.params.id as string
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Technician service deleted successfully.",
+    data: result,
+  });
+});
+
+const getAllTechnicianServices = catchAsync(async (req, res) => {
+  const result = await technicianService.getAllTechnicianServices();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All technician services retrieved successfully.",
+    data: result,
+  });
+});
+
 export const technicianServiceController = {
   createTechnicianService,
   getMyServices,
-  getTechnicianServices
+  getTechnicianServices,
+  updateMyService,
+  deleteMyService,
+  getAllTechnicianServices
 };

@@ -15,6 +15,18 @@ const createTechnicianServiceValidationSchema = z.object({
   }),
 });
 
+const updateTechnicianServiceValidationSchema = z.object({
+  body: z
+    .object({
+      price: z.number().positive().optional(),
+      description: z.string().trim().optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: "At least one field is required.",
+    }),
+});
+
 export const TechnicianServiceValidation = {
   createTechnicianServiceValidationSchema,
+  updateTechnicianServiceValidationSchema
 };
