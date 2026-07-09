@@ -5,7 +5,9 @@ import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import { ICreateCheckoutSession } from "./payment.interface";
 import httpStatus  from "http-status";
+import { formatBookingAvailability } from "../../utils/formatBooking";
 import Stripe from "stripe";
+
 
 const createCheckoutSession = async (
   userId: string,
@@ -125,7 +127,52 @@ const stripeWebhook = async (req: Request) => {
   }
 };
 
+const getMyPayments = async (userId: string) => {
+  const result = await prisma.payment.findMany({
+    where: {
+      booking: {
+        customerId: userId,
+      },
+    },
+    include: {
+      booking: {
+        include: {
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+          availability: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result.map((payment) => ({
+  ...payment,
+  booking: formatBookingAvailability(payment.booking),
+}));
+};
+
 export const paymentService = {
     createCheckoutSession,
-    stripeWebhook
+    stripeWebhook,
+    getMyPayments
  };

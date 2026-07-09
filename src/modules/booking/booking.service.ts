@@ -2,15 +2,15 @@ import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
 import { ICreateBooking } from "./booking.interface";
+import { formatBookingAvailability } from "../../utils/formatBooking";
 
 const getTechnicianBookingOrThrow = async (
   userId: string,
-  bookingId: string
+  bookingId: string,
+  
 ) => {
   const technicianProfile = await prisma.technicianProfile.findUnique({
-    where: {
-      userId,
-    },
+    where: { userId },
   });
 
   if (!technicianProfile) {
@@ -27,6 +27,9 @@ const getTechnicianBookingOrThrow = async (
         technicianProfileId: technicianProfile.id,
       },
     },
+    include: {
+      payment: true,
+    }
   });
 
   if (!booking) {
@@ -40,20 +43,7 @@ const getTechnicianBookingOrThrow = async (
 };
 
 
-const formatBookingAvailability = (
-  booking: any
-) => ({
-  ...booking,
-  availability: {
-    ...booking.availability,
-    startTime: booking.availability.startTime
-      .toISOString()
-      .substring(11, 16),
-    endTime: booking.availability.endTime
-      .toISOString()
-      .substring(11, 16),
-  },
-});
+
 const createBooking = async (
   userId: string,
   payload: ICreateBooking
@@ -492,41 +482,30 @@ const acceptBooking = async (
   userId: string,
   bookingId: string
 ) => {
-  // Find technician profile
-  const technicianProfile = await prisma.technicianProfile.findUnique({
-    where: {
-      userId,
-    },
-  });
-
-  if (!technicianProfile) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "Technician profile not found."
-    );
-  }
-
-  // Find booking
-  const booking = await prisma.booking.findFirst({
-    where: {
-      id: bookingId,
-      technicianService: {
-        technicianProfileId: technicianProfile.id,
-      },
-    },
-  });
-
-  if (!booking) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "Booking not found."
-    );
-  }
+  const booking = await getTechnicianBookingOrThrow(
+    userId,
+    bookingId
+    
+  );
 
   if (booking.status !== "REQUESTED") {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "Only requested bookings can be accepted."
+    );
+  }
+
+  if (!booking.payment) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Booking payment not found."
+    );
+  }
+
+  if (booking.payment.status !== "SUCCESS") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Payment has not been completed."
     );
   }
 
@@ -558,18 +537,7 @@ const acceptBooking = async (
     },
   });
 
-  return {
-    ...result,
-    availability: {
-      ...result.availability,
-      startTime: result.availability.startTime
-        .toISOString()
-        .substring(11, 16),
-      endTime: result.availability.endTime
-        .toISOString()
-        .substring(11, 16),
-    },
-  };
+  return formatBookingAvailability(result);
 };
 
 const declineBooking = async (
