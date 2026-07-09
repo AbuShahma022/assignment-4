@@ -26,7 +26,7 @@ const getAllCategories = catchAsync(async (req, res) => {
 });
 
 const getSingleCategory = catchAsync(async (req, res) => {
-  const result = await categoryService.getSingleCategory(req.params.id);
+  const result = await categoryService.getSingleCategory(req.params.id as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
