@@ -1,6 +1,6 @@
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
-import { ICreateTechnicianService } from "./technicianservices.interface";
+import { ICreateTechnicianService, IUpdateTechnicianService } from "./technicianservices.interface";
 import httpStatus from "http-status";
 
 const createTechnicianService = async (

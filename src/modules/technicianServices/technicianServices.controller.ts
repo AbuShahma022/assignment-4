@@ -44,7 +44,7 @@ const getTechnicianServices = catchAsync(async (req, res) => {
 const updateMyService = catchAsync(async (req, res) => {
   const result = await technicianService.updateMyService(
     req.user!.id,
-    req.params.id,
+    req.params.id as string,
     req.body
   );
 

@@ -1,10 +1,10 @@
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
-import { ILoginUser, IRegisterUser } from "./auth.Interface"
+import { ILoginUser} from "./auth.Interface"
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 import config from "../../config";
-import { Role } from "../../../generated/prisma/enums";
+
 import {jwtUtils}  from "../../utils/jwt";
 import { JwtPayload, SignOptions } from "jsonwebtoken";
 

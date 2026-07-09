@@ -1,8 +1,7 @@
-import { get } from "node:http";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import { formatBookingAvailability } from "../../utils/formatBooking";
-import { ICreateReview } from "./reviews.interface";
+import { ICreateReview, IUpdateReview } from "./reviews.interface";
 import httpStatus from "http-status";
 
 const updateTechnicianRating = async (

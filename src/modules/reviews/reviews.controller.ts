@@ -36,7 +36,7 @@ const getMyReviewDetailsById = catchAsync(
     const result =
       await reviewService.getMyReviewDetailsById(
         req.user!.id,
-        req.params.id
+        req.params.id as string
       );
 
     sendResponse(res, {
@@ -51,7 +51,7 @@ const getMyReviewDetailsById = catchAsync(
 const updateMyReview = catchAsync(async (req, res) => {
   const result = await reviewService.updateMyReview(
     req.user!.id,
-    req.params.id,
+    req.params.id as string,
     req.body
   );
 
@@ -65,7 +65,7 @@ const updateMyReview = catchAsync(async (req, res) => {
 
 const getTechnicianReviews = catchAsync(async (req, res) => {
   const result = await reviewService.getTechnicianReviews(
-    req.params.technicianId
+    req.params.technicianId as string
   );
 
   sendResponse(res, {
