@@ -38,8 +38,52 @@ const getMyPayments = catchAsync(async (req, res) => {
   });
 });
 
+const getMyPaymentDetailsById = catchAsync(
+  async (req, res) => {
+    const result =
+      await paymentService.getMyPaymentDetailsById(
+        req.user!.id,
+        req.params.id as string
+      );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Payment details retrieved successfully.",
+      data: result,
+    });
+  }
+);
+
+const getAllPayments = catchAsync(async (req, res) => {
+  const result = await paymentService.getAllPayments();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All payments retrieved successfully.",
+    data: result,
+  });
+});
+
+const getPaymentDetailsById = catchAsync(async (req, res) => {
+  const result = await paymentService.getPaymentDetailsById(
+    req.params.id as string
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Payment details retrieved successfully.",
+    data: result,
+  });
+});
+
 export const paymentController = {
   createCheckoutSession,
   stripeWebhook,
-  getMyPayments
+  getMyPayments,
+  getMyPaymentDetailsById,
+  getAllPayments,
+  getPaymentDetailsById
 };

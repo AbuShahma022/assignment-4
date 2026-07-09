@@ -25,4 +25,23 @@ router.get(
   paymentController.getMyPayments
 );
 
+router.get(
+  "/get-all-payments",
+  auth(Role.ADMIN),
+  paymentController.getAllPayments
+);
+
+router.get(
+  "/get-my-payment-details/:id",
+  auth(Role.CUSTOMER),
+  paymentController.getMyPaymentDetailsById
+);
+
+router.get(
+  "/get-payment-details/:id",
+  auth(Role.ADMIN),
+  paymentController.getPaymentDetailsById
+);
+
+
 export const paymentRoute = router

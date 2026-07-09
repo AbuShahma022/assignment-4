@@ -171,8 +171,158 @@ const getMyPayments = async (userId: string) => {
 }));
 };
 
+const getMyPaymentDetailsById = async (
+  userId: string,
+  paymentId: string
+) => {
+  const result = await prisma.payment.findFirst({
+    where: {
+      id: paymentId,
+      booking: {
+        customerId: userId,
+      },
+    },
+    include: {
+      booking: {
+        include: {
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+          availability: true,
+        },
+      },
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Payment not found."
+    );
+  }
+
+  return {
+    ...result,
+    booking: formatBookingAvailability(result.booking),
+  };
+};
+
+const getAllPayments = async () => {
+  const result = await prisma.payment.findMany({
+    include: {
+      booking: {
+        include: {
+          customer: {
+            omit: {
+              password: true,
+            },
+          },
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+          availability: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result.map((payment) => ({
+    ...payment,
+    booking: formatBookingAvailability(payment.booking),
+  }));
+};
+
+const getPaymentDetailsById = async (paymentId: string) => {
+  const result = await prisma.payment.findUnique({
+    where: {
+      id: paymentId,
+    },
+    include: {
+      booking: {
+        include: {
+          customer: {
+            omit: {
+              password: true,
+            },
+          },
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+          availability: true,
+        },
+      },
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Payment not found."
+    );
+  }
+
+  return {
+    ...result,
+    booking: formatBookingAvailability(result.booking),
+  };
+};
+
 export const paymentService = {
     createCheckoutSession,
     stripeWebhook,
-    getMyPayments
+    getMyPayments,
+    getMyPaymentDetailsById,
+    getAllPayments,
+    getPaymentDetailsById
  };
