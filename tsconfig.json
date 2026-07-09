@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
+    "module": "CommonJS",
     "outDir": "./dist",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "rootDir": "./",
     "target": "ES2023",
     "types": ["node"],
     "sourceMap": true,
@@ -11,10 +11,9 @@
     "noUncheckedIndexedAccess": true,
     "strict": true,
     "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  // "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "prisma.config.ts", "api"]
 }
