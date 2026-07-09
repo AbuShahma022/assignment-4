@@ -1,3 +1,4 @@
+import { get } from "node:http";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import { formatBookingAvailability } from "../../utils/formatBooking";
@@ -147,6 +148,332 @@ const createReview = async (
   };
 };
 
+const getMyReviews = async (userId: string) => {
+  const result = await prisma.review.findMany({
+    where: {
+      booking: {
+        customerId: userId,
+      },
+    },
+    include: {
+      booking: {
+        include: {
+          payment: true,
+          availability: true,
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result.map((review) => ({
+    ...review,
+    booking: formatBookingAvailability(review.booking),
+  }));
+};
+
+const getMyReviewDetailsById = async (
+  userId: string,
+  reviewId: string
+) => {
+  const result = await prisma.review.findFirst({
+    where: {
+      id: reviewId,
+      booking: {
+        customerId: userId,
+      },
+    },
+    include: {
+      booking: {
+        include: {
+          payment: true,
+          availability: true,
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Review not found."
+    );
+  }
+
+  return {
+    ...result,
+    booking: formatBookingAvailability(result.booking),
+  };
+};
+
+const updateMyReview = async (
+  userId: string,
+  reviewId: string,
+  payload: IUpdateReview
+) => {
+  const review = await prisma.review.findFirst({
+    where: {
+      id: reviewId,
+      booking: {
+        customerId: userId,
+      },
+    },
+    include: {
+      booking: {
+        include: {
+          technicianService: {
+            select: {
+              technicianProfileId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!review) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Review not found."
+    );
+  }
+
+  const result = await prisma.review.update({
+    where: {
+      id: reviewId,
+    },
+    data: payload,
+    include: {
+      booking: {
+        include: {
+          payment: true,
+          availability: true,
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  await updateTechnicianRating(
+    review.booking.technicianService.technicianProfileId
+  );
+
+  return {
+    ...result,
+    booking: formatBookingAvailability(result.booking),
+  };
+};
+
+const getTechnicianReviews = async (
+  technicianId: string
+) => {
+  const technician = await prisma.technicianProfile.findUnique({
+    where: {
+      id: technicianId,
+    },
+  });
+
+  if (!technician) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Technician not found."
+    );
+  }
+
+  const result = await prisma.review.findMany({
+    where: {
+      booking: {
+        technicianService: {
+          technicianProfileId: technicianId,
+        },
+      },
+    },
+    include: {
+      booking: {
+        include: {
+          customer: {
+            omit: {
+              password: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return {
+  averageRating: technician.averageRating,
+  totalReviews: technician.totalReviews,
+  reviews: result,
+};
+};
+
+const getAllReviews = async () => {
+  const result = await prisma.review.findMany({
+    include: {
+      booking: {
+        include: {
+          customer: {
+            omit: {
+              password: true,
+            },
+          },
+          payment: true,
+          availability: true,
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result.map((review) => ({
+    ...review,
+    booking: formatBookingAvailability(review.booking),
+  }));
+};
+
+const getReviewDetailsById = async (
+  reviewId: string
+) => {
+  const result = await prisma.review.findUnique({
+    where: {
+      id: reviewId,
+    },
+    include: {
+      booking: {
+        include: {
+          customer: {
+            omit: {
+              password: true,
+            },
+          },
+          payment: true,
+          availability: true,
+          technicianService: {
+            include: {
+              service: {
+                include: {
+                  category: true,
+                },
+              },
+              technicianProfile: {
+                include: {
+                  user: {
+                    omit: {
+                      password: true,
+                    },
+                  },
+                  location: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!result) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Review not found."
+    );
+  }
+
+  return {
+    ...result,
+    booking: formatBookingAvailability(result.booking),
+  };
+};
+
 export const reviewService = {
   createReview,
+  getMyReviews,
+  getMyReviewDetailsById,
+  updateMyReview,
+  getTechnicianReviews,
+  getAllReviews,
+  getReviewDetailsById,
 };
