@@ -42,7 +42,7 @@ const getMyServiceRequestDetailsById = catchAsync(
     const result =
       await serviceRequestService.getMyServiceRequestDetailsById(
         req.user!.id,
-        req.params.id
+        req.params.id as string
       );
 
     sendResponse(res, {
@@ -55,8 +55,76 @@ const getMyServiceRequestDetailsById = catchAsync(
   }
 );
 
+const getAllServiceRequests = catchAsync(async (req, res) => {
+  const result =
+    await serviceRequestService.getAllServiceRequests();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "All service requests retrieved successfully.",
+    data: result,
+  });
+});
+
+const getServiceRequestDetailsById = catchAsync(
+  async (req, res) => {
+    const result =
+      await serviceRequestService.getServiceRequestDetailsById(
+        req.params.id as string
+      );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message:
+        "Service request details retrieved successfully.",
+      data: result,
+    });
+  }
+);
+
+const approveServiceRequest = catchAsync(
+  async (req, res) => {
+    const result =
+      await serviceRequestService.approveServiceRequest(
+        req.params.id as string
+      );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message:
+        "Service request approved successfully.",
+      data: result,
+    });
+  }
+);
+
+const rejectServiceRequest = catchAsync(
+  async (req, res) => {
+    const result =
+      await serviceRequestService.rejectServiceRequest(
+        req.params.id as string,
+        req.body
+      );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message:
+        "Service request rejected successfully.",
+      data: result,
+    });
+  }
+);
+
 export const serviceRequestController = {
   createServiceRequest,
   getMyServiceRequests,
-  getMyServiceRequestDetailsById
+  getMyServiceRequestDetailsById,
+  getAllServiceRequests,
+  getServiceRequestDetailsById,
+  approveServiceRequest,
+  rejectServiceRequest
 };

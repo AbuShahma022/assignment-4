@@ -1,6 +1,7 @@
+import { Prisma } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
-import { ICreateService, IUpdateService } from "./MasterService.interface";
+import { ICreateService, IGetAllServicesQuery, IUpdateService } from "./MasterService.interface";
 import httpStatus from "http-status";
 
 const createService = async (payload: ICreateService) => {
@@ -47,14 +48,31 @@ const createService = async (payload: ICreateService) => {
   return result;
 };
 
-const getAllServices = async () => {
-  const result = await prisma.service.findMany({
-    where: {
+const getAllServices = async (
+  query: IGetAllServicesQuery
+) => {
+  const { search, categoryId } = query;
+
+  const where: Prisma.ServiceWhereInput = {
+    status: "ACTIVE",
+    category: {
       status: "ACTIVE",
-      category: {
-        status: "ACTIVE",
-      },
     },
+  };
+
+  if (search) {
+    where.name = {
+      contains: search,
+      mode: "insensitive",
+    };
+  }
+
+  if (categoryId) {
+    where.categoryId = categoryId;
+  }
+
+  const result = await prisma.service.findMany({
+    where,
     include: {
       category: true,
     },

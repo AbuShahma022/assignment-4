@@ -13,3 +13,11 @@ export interface ICreateTechnicianProfile {
 
 export interface IUpdateTechnicianProfile
   extends Partial<ICreateTechnicianProfile> {}
+
+  export interface IGetAllTechniciansQuery {
+  search?: string;
+  district?: string;
+  minRating?: string;
+  minPrice?: string;
+  maxPrice?: string;
+}

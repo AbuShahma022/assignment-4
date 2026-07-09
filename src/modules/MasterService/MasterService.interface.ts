@@ -6,3 +6,8 @@ export interface ICreateService {
 
 export interface IUpdateService
   extends Partial<ICreateService> {}
+
+  export interface IGetAllServicesQuery {
+  search?: string;
+  categoryId?: string;
+}

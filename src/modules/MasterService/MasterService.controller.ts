@@ -1,5 +1,6 @@
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { IGetAllServicesQuery } from "./MasterService.interface";
 import { masterService } from "./MasterService.service";
 import httpStatus  from "http-status";
 
@@ -15,7 +16,7 @@ const createService = catchAsync(async (req, res) => {
 });
 
 const getAllServices = catchAsync(async (req, res) => {
-  const result = await masterService.getAllServices();
+  const result = await masterService.getAllServices(req.query as IGetAllServicesQuery);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -51,7 +52,7 @@ const updateService = catchAsync(async (req, res) => {
 });
 
 const deleteService = catchAsync(async (req, res) => {
-  const result = await masterService.deleteService(req.params.id);
+  const result = await masterService.deleteService(req.params.id as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

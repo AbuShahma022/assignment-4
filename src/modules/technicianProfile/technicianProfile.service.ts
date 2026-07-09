@@ -3,7 +3,7 @@ import { Role } from "../../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import { jwtUtils } from "../../utils/jwt";
-import { ICreateTechnicianProfile, IUpdateTechnicianProfile } from "./technicianProfile.interface";
+import { ICreateTechnicianProfile, IGetAllTechniciansQuery, IUpdateTechnicianProfile } from "./technicianProfile.interface";
 import httpStatus from "http-status"
 const createTechnicianProfile = async (
   userId: string,
@@ -252,8 +252,67 @@ return result;
   
 };
 
-const getAllTechnicians = async () => {
+const getAllTechnicians = async (
+  query: IGetAllTechniciansQuery
+) => {
+  const {
+    search,
+    district,
+    minRating,
+    minPrice,
+    maxPrice,
+  } = query;
+
+  const where: Prisma.TechnicianProfileWhereInput = {};
+
+  // Location filter
+  if (district) {
+    where.location = {
+      district: {
+        equals: district,
+        mode: "insensitive",
+      },
+    };
+  }
+
+  // Rating filter
+  if (minRating) {
+    where.averageRating = {
+      gte: Number(minRating),
+    };
+  }
+
+  // Service search & price filter
+  if (search || minPrice || maxPrice) {
+    where.technicianServices = {
+      some: {
+        status: "ACTIVE",
+
+        ...(search && {
+          service: {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        }),
+
+        ...((minPrice || maxPrice) && {
+          price: {
+            ...(minPrice && {
+              gte: Number(minPrice),
+            }),
+            ...(maxPrice && {
+              lte: Number(maxPrice),
+            }),
+          },
+        }),
+      },
+    };
+  }
+
   const result = await prisma.technicianProfile.findMany({
+    where,
     include: {
       user: {
         omit: {
@@ -264,6 +323,18 @@ const getAllTechnicians = async () => {
         },
       },
       location: true,
+      technicianServices: {
+        where: {
+          status: "ACTIVE",
+        },
+        include: {
+          service: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      },
     },
     orderBy: {
       averageRating: "desc",

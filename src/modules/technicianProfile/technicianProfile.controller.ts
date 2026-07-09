@@ -1,6 +1,7 @@
 import config from "../../config";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
+import { IGetAllTechniciansQuery } from "./technicianProfile.interface";
 import { technicianProfileService } from "./technicianProfile.service";
 import httpStatus  from "http-status";
 
@@ -58,7 +59,7 @@ const updateMyTechnicianProfile = catchAsync(async (req, res) => {
 });
 
 const getAllTechnicians = catchAsync(async (req, res) => {
-  const result = await technicianProfileService.getAllTechnicians();
+  const result = await technicianProfileService.getAllTechnicians( req.query as IGetAllTechniciansQuery);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -70,7 +71,7 @@ const getAllTechnicians = catchAsync(async (req, res) => {
 
 const getSingleTechnician = catchAsync(async (req, res) => {
   const result = await technicianProfileService.getSingleTechnician(
-    req.params.id
+    req.params.id as string
   );
 
   sendResponse(res, {
