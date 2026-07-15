@@ -8,14 +8,6 @@ A robust RESTful backend API for **FixItNow**, a home service marketplace that c
 
 https://assignment-4-ph.vercel.app
 
-## 📚 API Documentation
-
-https://documenter.getpostman.com/view/xxxxxxxx
-
-## 🎥 Demo Video
-
-https://drive.google.com/file/d/xxxxxxxx/view
-
 ---
 
 ## ✨ Features
